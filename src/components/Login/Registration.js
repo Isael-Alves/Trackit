@@ -1,80 +1,80 @@
 import logo from "../../assets/img/Group 8.svg";
-import styled from "styled-components";
-import {useNavigate} from 'react-router-dom'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button, Body, Form } from "../../styles/loginStyle";
 
-function Registration(){
-    const navigate = useNavigate();
+function Registration() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    name: "",
+    photo: "",
+  });
 
-    return (
-        <Body>
-          <img src={logo} alt="Logo" />
-          <Form>
-            <input></input>
-            <input></input>
-            <input></input>
-            <input></input>
-            <Button>Cadastrar</Button>
-          </Form>
-          <h5 onClick={() => navigate(`../`)}>Não tem uma conta? Cadastre-se!</h5>
-        </Body>
-      );
+  function handleForm(e) {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  }
+
+  function sendForm(e) {
+    e.preventDefault();
+    const body = {
+      ...form,
+    };
+    console.log(body);
+    navigate(`../`);
+    setForm({
+      email: "",
+      password: "",
+      name: "",
+      photo: "",
+    });
+  }
+
+  return (
+    <Body>
+      <img src={logo} alt="Logo" />
+      <Form onSubmit={sendForm}>
+        <input
+          type="email"
+          name="email"
+          placeholder="email"
+          onChange={handleForm}
+          value={form.email}
+          required
+        ></input>
+        <input
+          type="password"
+          name="password"
+          placeholder="senha"
+          onChange={handleForm}
+          value={form.password}
+          required
+        ></input>
+        <input
+          type="text"
+          name="name"
+          placeholder="nome"
+          onChange={handleForm}
+          value={form.name}
+          required
+        ></input>
+        <input
+          type="text"
+          name="photo"
+          placeholder="foto"
+          onChange={handleForm}
+          value={form.photo}
+          required
+        ></input>
+        <Button>Cadastrar</Button>
+      </Form>
+      <h5 onClick={() => navigate(`../`)}>Não tem uma conta? Cadastre-se!</h5>
+    </Body>
+  );
 }
-
-const Body = styled.nav`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  img {
-    margin-top: 68px;
-    width: 180px;
-    height: 180px;
-  }
-
-  h5 {
-    margin-top: 25px;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 17px;
-    text-decoration-line: underline;
-
-    color: #52b6ff;
-  }
-`;
-
-const Form = styled.form`
-  margin-top: 33px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  input {
-    width: 303px;
-    height: 45px;
-    margin-bottom: 6px;
-
-    background: #ffffff;
-    border: 1px solid #d5d5d5;
-    border-radius: 5px;
-  }
-`;
-
-const Button = styled.div`
-  width: 303px;
-  height: 45px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-weight: 400;
-  font-size: 21px;
-  line-height: 26px;
-
-  background: #52b6ff;
-  color: #ffffff;
-  border-radius: 5px;
-`;
 
 export default Registration;

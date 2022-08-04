@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./Login/Login";
 import Registration from "./Login/Registration";
-import styled from "styled-components";
+import Today from "./Today/Today";
 import GlobalStyle from "../styles/globalStyles";
 
 export default function App() {
@@ -12,7 +12,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="registration" element={<Registration />} />
-          <Route />
+          <Route path="hoje" element={<Today />} />
         </Routes>
       </BrowserRouter>
     </>
