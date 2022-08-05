@@ -50,7 +50,7 @@ export default function Today() {
         );
       });
     }
-    return <h1>Nenhum hábito para hoje</h1>;
+    return <h1>Nenhum hábito para hoje</h1>
   }
 
   return (

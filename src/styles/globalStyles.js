@@ -60,6 +60,7 @@ a {
 body {
   font-family: 'Lexend Deca', sans-serif;
   color: #293845;
+  background-color: #F2F2F2;
 }
 `;
 
