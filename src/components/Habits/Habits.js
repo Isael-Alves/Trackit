@@ -1,6 +1,7 @@
 import Navbar from "../Navbar";
 import styled from "styled-components";
 import { MdAdd } from "react-icons/md";
+import { BsTrash } from "react-icons/bs";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import BoxNewHabit from "./BoxNewHabit";
@@ -8,6 +9,7 @@ import BoxNewHabit from "./BoxNewHabit";
 export default function Habits() {
   const [addHabit, setAddHabit] = useState(false);
   const [myHabits, setMyHabits] = useState([]);
+  const daysWeek = ["D", "S", "T", "Q", "Q", "S", "S"];
 
   useEffect(() => {
     const config = {
@@ -34,7 +36,41 @@ export default function Habits() {
 
   function renderHabits() {
     if (myHabits.length > 0) {
-      console.log("renderizar habitos da API.");
+      console.log(myHabits);
+      return (
+        <ul>
+          {myHabits.map((habit) => {
+            return (
+              <Habit id={habit.id} key={habit.id}>
+                <div>
+                  <h2>{habit.name}</h2>
+                  <ul>
+                    {daysWeek.map((day, i) => (
+                      <li
+                        key={i}
+                        style={
+                          day.selected
+                            ? {
+                                backgroundColor: "#CFCFCF",
+                                color: "#FFFFFF",
+                              }
+                            : {
+                                backgroundColor: "#FFFFFF",
+                                color: "#dbdbdb",
+                              }
+                        }
+                      >
+                        {day}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <BsTrash />
+              </Habit>
+            );
+          })}
+        </ul>
+      );
     }
     return (
       <Message>
@@ -88,6 +124,50 @@ const Title = styled.header`
       height: 20px;
 
       color: #ffffff;
+    }
+  }
+`;
+
+const Habit = styled.li`
+  margin: 0 auto;
+  width: 340px;
+  height: 91px;
+  margin-bottom: 10px;
+  padding: 15px;
+
+  display: flex;
+  justify-content: space-between;
+
+  background-color: #ffffff;
+  border-radius: 5px;
+
+  h2 {
+    margin-bottom: 8px;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 25px;
+
+    color: #666666;
+  }
+
+  ul {
+    display: flex;
+
+    li {
+      width: 30px;
+      height: 30px;
+      margin-right: 4px;
+
+      font-weight: 400;
+      font-size: 20px;
+      line-height: 25px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border: 1px solid #d5d5d5;
+      border-radius: 5px;
     }
   }
 `;

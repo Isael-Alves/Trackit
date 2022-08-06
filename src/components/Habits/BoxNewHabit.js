@@ -1,37 +1,145 @@
 import styled from "styled-components";
+import { ThreeDots } from "react-loader-spinner";
+import axios from "axios";
 import { useState } from "react";
 
 export default function BoxNewHabit({ setAddHabit }) {
-  const daysWeek = ["D", "S", "T", "Q", "Q", "S", "S"];
-  const [selectedDay, setSelectedDay] = useState(false);
+  const [name, setName] = useState("");
+  const daysWeek = [
+    { name: "D", selected: false },
+    { name: "S", selected: false },
+    { name: "T", selected: false },
+    { name: "Q", selected: false },
+    { name: "Q", selected: false },
+    { name: "S", selected: false },
+    { name: "S", selected: false },
+  ];
+  const [selectedDay, setSelectedDay] = useState(daysWeek);
+  const [loading, setLoading] = useState(false);
+
+  const config = {
+    headers: {
+      Authorization:
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDc0NiwiaWF0IjoxNjU5NTg3Mzg3fQ.DK3brEQ_wc1OPtL601VuUZa9UZ_6gwtVqvGtw_1kthY",
+    },
+  };
+
+  function constForm() {
+    const days = [];
+    setLoading(true);
+
+    selectedDay.map((day, i) => {
+      if (day.selected === true) {
+        days.push(i);
+      }
+      return days;
+    });
+
+    const body = {
+      name,
+      days,
+    };
+
+    if (name.length < 1 && days.length < 1) {
+      alert("Digite o nome do hábito e escolha o(s) dia(s).");
+      setLoading(false);
+    }
+    if (name.length < 1 && days.length > 0) {
+      alert("Digite o nome do hábito.");
+      setLoading(false);
+    }
+    if (name.length > 0 && days.length < 1) {
+      alert("escolha o(s) dia(s).");
+      setLoading(false);
+    }
+    if (name.length > 0 && days.length > 0) {
+      submitForm(body);
+      setLoading(false);
+    }
+  }
+
+  function submitForm(body) {
+    const promise = axios.post(
+      `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits`,
+      body,
+      config
+    );
+
+    promise.then((res) => {
+      setLoading(false);
+      setAddHabit(false);
+      console.log(res.data);
+    });
+
+    promise.catch((err) => {
+      const message = err.response.statusText;
+      alert(message);
+      setLoading(false);
+    });
+  }
+
+  function selected(id) {
+    const newArray = selectedDay.map((dia, i) => {
+      if (i === id) {
+        return {
+          ...dia,
+          selected: !dia.selected,
+        };
+      }
+      return {
+        ...dia,
+      };
+    });
+    setSelectedDay([...newArray]);
+  }
 
   return (
     <BoxHabit>
-      <input placeholder="nome do hábito" />
+      <input
+        type="text"
+        placeholder="nome do hábito"
+        onChange={(e) => {
+          setName(e.target.value);
+        }}
+        value={name}
+        required
+      />
       <ul>
-        {daysWeek.map((day, i) => (
+        {selectedDay.map((day, i) => (
           <li
+            id={i}
             key={i}
             style={
-              selectedDay
+              day.selected
                 ? {
                     backgroundColor: "#CFCFCF",
-                    color: "#FFFFFF"
+                    color: "#FFFFFF",
                   }
                 : {
                     backgroundColor: "#FFFFFF",
-                    color: "#dbdbdb"
+                    color: "#dbdbdb",
                   }
             }
-            onClick={() => setSelectedDay(!selectedDay)}
+            onClick={() => {
+              if (!loading) {
+                selected(i);
+              }
+              return "";
+            }}
           >
-            {day}
+            {day.name}
           </li>
         ))}
       </ul>
       <div>
         <h5 onClick={() => setAddHabit(false)}>Cancelar</h5>
-        <button>Salvar</button>
+        <button onClick={() => constForm()}>
+          {!loading ? (
+            "Salvar"
+          ) : (
+            <ThreeDots color="#FFFFFF" height={20} width={70} />
+          )}
+        </button>
       </div>
     </BoxHabit>
   );
@@ -102,13 +210,17 @@ const BoxHabit = styled.section`
       width: 84px;
       height: 35px;
 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
       font-weight: 400;
       font-size: 16px;
       line-height: 20px;
 
       border: none;
       color: #ffffff;
-      background: #52b6ff;
+      background-color: #52b6ff;
       border-radius: 5px;
     }
   }
