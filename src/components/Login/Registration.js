@@ -1,16 +1,20 @@
 import logo from "../../assets/img/Group 8.svg";
+import axios from "axios";
+import { ThreeDots } from "react-loader-spinner";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Body, Form } from "../../styles/loginStyle";
 
 function Registration() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
+  const [loading, setLoading] = useState(false);
+  const clearForm = {
     email: "",
     password: "",
     name: "",
-    photo: "",
-  });
+    image: "",
+  };
+  const [form, setForm] = useState(clearForm);
 
   function handleForm(e) {
     setForm({
@@ -20,18 +24,32 @@ function Registration() {
   }
 
   function sendForm(e) {
-    e.preventDefault();
-    const body = {
-      ...form,
-    };
-    console.log(body);
-    navigate(`../`);
-    setForm({
-      email: "",
-      password: "",
-      name: "",
-      photo: "",
-    });
+    if (!loading) {
+      e.preventDefault();
+      setLoading(true);
+      const body = {
+        ...form,
+      };
+
+      const promise = axios.post(
+        `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/sign-up`,
+        body
+      );
+
+      promise.then((res) => {
+        alert("Usuário criado com sucesso!");
+        navigate(`../`);
+        setForm(clearForm);
+        setLoading(false);
+      });
+
+      promise.catch((err) => {
+        const message = err.response.statusText;
+        alert(message);
+        setForm(clearForm);
+        setLoading(false);
+      });
+    }
   }
 
   return (
@@ -64,13 +82,19 @@ function Registration() {
         ></input>
         <input
           type="text"
-          name="photo"
+          name="image"
           placeholder="foto"
           onChange={handleForm}
-          value={form.photo}
+          value={form.image}
           required
         ></input>
-        <Button>Cadastrar</Button>
+        <Button>
+          {!loading ? (
+            "Cadastrar"
+          ) : (
+            <ThreeDots color="#FFFFFF" height={20} width={70} />
+          )}
+        </Button>
       </Form>
       <h5 onClick={() => navigate(`../`)}>Não tem uma conta? Cadastre-se!</h5>
     </Body>

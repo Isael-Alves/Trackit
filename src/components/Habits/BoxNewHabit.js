@@ -3,7 +3,7 @@ import { ThreeDots } from "react-loader-spinner";
 import axios from "axios";
 import { useState } from "react";
 
-export default function BoxNewHabit({ setAddHabit }) {
+export default function BoxNewHabit({ myHabits, setMyHabits, setAddHabit, token }) {
   const [name, setName] = useState("");
   const daysWeek = [
     { name: "D", selected: false },
@@ -20,7 +20,7 @@ export default function BoxNewHabit({ setAddHabit }) {
   const config = {
     headers: {
       Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDc0NiwiaWF0IjoxNjU5NTg3Mzg3fQ.DK3brEQ_wc1OPtL601VuUZa9UZ_6gwtVqvGtw_1kthY",
+        `Bearer ${token}`,
     },
   };
 
@@ -68,7 +68,7 @@ export default function BoxNewHabit({ setAddHabit }) {
     promise.then((res) => {
       setLoading(false);
       setAddHabit(false);
-      console.log(res.data);
+      // setMyHabits([...myHabits, res.data]);
     });
 
     promise.catch((err) => {
@@ -150,6 +150,7 @@ const BoxHabit = styled.section`
   width: 340px;
   height: 180px;
   padding: 19px;
+  margin-bottom: 10px;
 
   background: #ffffff;
   border-radius: 5px;

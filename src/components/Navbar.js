@@ -1,11 +1,14 @@
 import styled from "styled-components";
-import Bob from "../assets/img/Rectangle 14.svg";
+import { AuthContext } from "../providers/auth";
+import React from "react";
 
 export default function Navbar() {
+  const {dados} = React.useContext(AuthContext); 
+  const {image} = dados;
   return (
     <Topbar>
       <h1>TrackIt</h1>
-      <img src={Bob} alt="User" />
+      <img src={image} alt="User" />
     </Topbar>
   );
 }

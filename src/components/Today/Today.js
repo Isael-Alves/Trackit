@@ -1,17 +1,23 @@
 import styled from "styled-components";
+import * as dayjs from 'dayjs';
 import { FaCheck } from "react-icons/fa";
 import Navbar from "../Navbar";
-import { useEffect, useState } from "react";
+import Footer from "../Footer/Footer";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { AuthContext } from "../../providers/auth";
 
 export default function Today() {
+  const {dados, setScreen} = React.useContext(AuthContext); 
+  const {token} = dados;
   const [habitsToday, setHabitsToday] = useState([]);
+  setScreen("hoje");
 
   useEffect(() => {
     const config = {
       headers: {
         Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDc0NiwiaWF0IjoxNjU5NTg3Mzg3fQ.DK3brEQ_wc1OPtL601VuUZa9UZ_6gwtVqvGtw_1kthY",
+          `Bearer ${token}`,
       },
     };
 
@@ -22,6 +28,7 @@ export default function Today() {
 
     promise.then((res) => {
       setHabitsToday(res.data);
+      console.log(res.data);
     });
 
     promise.catch((err) => {
@@ -53,16 +60,25 @@ export default function Today() {
     return <h1>Nenhum hábito para hoje</h1>
   }
 
+function todayDay(){
+  const today = dayjs();
+  const day = today.date();
+  const month = today.month();
+  console.log(today);
+  return `Segunda, ${day}/${month}`
+}
+
   return (
     <>
       <Navbar />
       <Container>
         <Title>
-          <h1>Segunda, 17/05</h1>
+          <h1>{todayDay()}</h1>
           <h2>Nenhum hábito concluído ainda</h2>
         </Title>
         <Habits>{StructuringHabits()}</Habits>
       </Container>
+      <Footer />
     </>
   );
 }
@@ -101,6 +117,7 @@ const Habits = styled.ul`
     width: 340px;
     height: 94px;
     padding: 15px;
+    margin-bottom: 10px;
 
     display: flex;
     justify-content: space-between;

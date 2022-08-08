@@ -2,23 +2,27 @@ import Navbar from "../Navbar";
 import styled from "styled-components";
 import { MdAdd } from "react-icons/md";
 import { BsTrash } from "react-icons/bs";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { AuthContext } from "../../providers/auth";
 import axios from "axios";
 import BoxNewHabit from "./BoxNewHabit";
+import Footer from "../Footer/Footer";
 
 export default function Habits() {
+  const { dados, setScreen } = React.useContext(AuthContext);
+  const { token } = dados;
+  setScreen("habitos");
   const [addHabit, setAddHabit] = useState(false);
   const [myHabits, setMyHabits] = useState([]);
   const daysWeek = ["D", "S", "T", "Q", "Q", "S", "S"];
 
-  useEffect(() => {
-    const config = {
-      headers: {
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDc0NiwiaWF0IjoxNjU5NTg3Mzg3fQ.DK3brEQ_wc1OPtL601VuUZa9UZ_6gwtVqvGtw_1kthY",
-      },
-    };
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
+  useEffect(() => {
     const promise = axios.get(
       `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits`,
       config
@@ -34,9 +38,40 @@ export default function Habits() {
     });
   }, []);
 
+  function escolherCor(habit, i) {
+    if (habit.days.some((d) => d === i)) {
+      return {
+        backgroundColor: "#CFCFCF",
+        color: "#FFFFFF",
+      };
+    }
+    return {
+      backgroundColor: "#FFFFFF",
+      color: "#dbdbdb",
+    };
+  }
+
+  function deleteHabit(id) {
+    const confirmar = window.confirm("Você tem certeza que deseja apagar?");
+    if (confirmar) {
+      const promise = axios.delete(
+        `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}`,
+        config
+      );
+
+      promise.then(() => {
+        setAddHabit(false);
+      });
+
+      promise.catch((err) => {
+        const message = err.response.statusText;
+        alert(message);
+      });
+    }
+  }
+
   function renderHabits() {
     if (myHabits.length > 0) {
-      console.log(myHabits);
       return (
         <ul>
           {myHabits.map((habit) => {
@@ -46,26 +81,13 @@ export default function Habits() {
                   <h2>{habit.name}</h2>
                   <ul>
                     {daysWeek.map((day, i) => (
-                      <li
-                        key={i}
-                        style={
-                          day.selected
-                            ? {
-                                backgroundColor: "#CFCFCF",
-                                color: "#FFFFFF",
-                              }
-                            : {
-                                backgroundColor: "#FFFFFF",
-                                color: "#dbdbdb",
-                              }
-                        }
-                      >
+                      <li key={i} style={escolherCor(habit, i)}>
                         {day}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <BsTrash />
+                <BsTrash onClick={() => deleteHabit(habit.id)} />
               </Habit>
             );
           })}
@@ -89,8 +111,13 @@ export default function Habits() {
           <MdAdd onClick={() => setAddHabit(true)} />
         </div>
       </Title>
-      {!addHabit ? "" : <BoxNewHabit setAddHabit={setAddHabit} />}
+      {!addHabit ? (
+        ""
+      ) : (
+        <BoxNewHabit setAddHabit={setAddHabit} myHabits={myHabits} token={token} />
+      )}
       {renderHabits()}
+      <Footer />
     </>
   );
 }
