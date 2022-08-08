@@ -3,7 +3,7 @@ import { ThreeDots } from "react-loader-spinner";
 import axios from "axios";
 import { useState } from "react";
 
-export default function BoxNewHabit({ myHabits, setMyHabits, setAddHabit, token }) {
+export default function BoxNewHabit({setAddHabit, token, renderMayHabits }) {
   const [name, setName] = useState("");
   const daysWeek = [
     { name: "D", selected: false },
@@ -68,7 +68,7 @@ export default function BoxNewHabit({ myHabits, setMyHabits, setAddHabit, token 
     promise.then((res) => {
       setLoading(false);
       setAddHabit(false);
-      // setMyHabits([...myHabits, res.data]);
+      renderMayHabits();
     });
 
     promise.catch((err) => {

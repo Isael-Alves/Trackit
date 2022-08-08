@@ -6,10 +6,10 @@ import "react-circular-progressbar/dist/styles.css";
 import { AuthContext } from "../../providers/auth";
 import { useState } from "react";
 
-export default function Footer() {
+export default function Footer(percent) {
+  console.log(percent)
   const { screen } = React.useContext(AuthContext);
   const navigate = useNavigate();
-  const percentage = 55;
   return (
     <BoxFooter>
       <h2
@@ -32,7 +32,7 @@ export default function Footer() {
         }}
       >
         <CircularProgressbar
-          value={percentage}
+          value={percent}
           text={`hoje`}
           background
           backgroundPadding={6}

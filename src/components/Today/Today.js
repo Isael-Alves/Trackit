@@ -1,72 +1,155 @@
 import styled from "styled-components";
-import * as dayjs from 'dayjs';
+import * as dayjs from "dayjs";
 import { FaCheck } from "react-icons/fa";
 import Navbar from "../Navbar";
 import Footer from "../Footer/Footer";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { AuthContext } from "../../providers/auth";
+import { useNavigate } from "react-router-dom";
 
 export default function Today() {
-  const {dados, setScreen} = React.useContext(AuthContext); 
-  const {token} = dados;
-  const [habitsToday, setHabitsToday] = useState([]);
+  const { dados, setScreen } = React.useContext(AuthContext);
   setScreen("hoje");
+  const { token } = dados;
+  const [habitsToday, setHabitsToday] = useState([]);
+  const [percent, setPercent] = useState(null);
+  const navigate = useNavigate();
+  const body = {};
 
-  useEffect(() => {
-    const config = {
-      headers: {
-        Authorization:
-          `Bearer ${token}`,
-      },
-    };
+  function checkLoggedUser() {
+    if (token === undefined) {
+      navigate("../");
+      window.location.reload();
+    }
+  }
+  checkLoggedUser();
 
-    const promise = axios.get(
-      `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/today`,
-      config
-    );
+  const URL =
+    "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/";
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  function renderHabits() {
+    const promise = axios.get(`${URL}today`, config);
 
     promise.then((res) => {
       setHabitsToday(res.data);
-      console.log(res.data);
     });
 
     promise.catch((err) => {
       const message = err.response.statusText;
       alert(message);
     });
+  }
 
+  useEffect(() => {
+    renderHabits();
   }, []);
 
+  function uncheckHabit(id) {
+    const promise = axios.post(`${URL}${id}/uncheck`, body, config);
+
+    promise.then(() => {
+      renderHabits();
+    });
+
+    promise.catch((err) => {
+      const message = err.response.statusText;
+      alert(message);
+    });
+  }
+
+  function checkHabit(id) {
+    const promise = axios.post(`${URL}${id}/check`, body, config);
+
+    promise.then(() => {
+      renderHabits();
+    });
+
+    promise.catch((err) => {
+      const message = err.response.statusText;
+      alert(message);
+    });
+  }
+
+  function CriandoSubText() {
+    let cont = 0;
+    const qtdHabits = habitsToday.length;
+    let porcento = (cont / qtdHabits) * 100;
+    console.log(habitsToday);
+
+    useEffect(() => {
+      setPercent(porcento);
+    },[porcento]);
+
+    if (qtdHabits > 0 && porcento !== 0) {
+      habitsToday.forEach((habit) => {
+        if (habit.done) {
+          cont = cont + 1;
+        }
+      });
+
+      porcento = (cont / qtdHabits) * 100;
+
+      return (
+        <h2 style={{ color: "#8FC549" }}>{porcento}% dos hábitos concuidos</h2>
+      );
+    }
+
+    return <h2> Nenhum hábito concluído ainda </h2>;
+  }
 
   function StructuringHabits() {
     if (habitsToday.length > 0) {
       return habitsToday.map((habit) => {
         const { id, name, done, currentSequence, highestSequence } = habit;
         return (
-          <li key={id} id={id} >
+          <li key={id} id={id}>
             <section>
               <h3>{name}</h3>
-              <h4>Sequência atual: {currentSequence} dia(s)</h4>
+              <h4>
+                Sequência atual:{" "}
+                <span
+                  style={
+                    currentSequence === highestSequence
+                      ? { color: "#8FC549" }
+                      : { color: "#666666" }
+                  }
+                >
+                  {currentSequence} dia(s)
+                </span>
+              </h4>
               <h4>Seu recorde: {highestSequence} dias</h4>
             </section>
-            <div done={done}>
+            <div
+              style={
+                done
+                  ? { backgroundColor: "#8FC549" }
+                  : { backgroundColor: "#EBEBEB" }
+              }
+              onClick={() => {
+                done ? uncheckHabit(id) : checkHabit(id);
+              }}
+            >
               <FaCheck />
             </div>
           </li>
         );
       });
     }
-    return <h1>Nenhum hábito para hoje</h1>
+    return <h1>Nenhum hábito para hoje</h1>;
   }
 
-function todayDay(){
-  const today = dayjs();
-  const day = today.date();
-  const month = today.month();
-  console.log(today);
-  return `Segunda, ${day}/${month}`
-}
+  function todayDay() {
+    const today = dayjs();
+    const day = today.date();
+    const month = today.month();
+    return `Segunda, ${day}/${month}`;
+  }
 
   return (
     <>
@@ -74,11 +157,11 @@ function todayDay(){
       <Container>
         <Title>
           <h1>{todayDay()}</h1>
-          <h2>Nenhum hábito concluído ainda</h2>
+          <CriandoSubText />
         </Title>
         <Habits>{StructuringHabits()}</Habits>
       </Container>
-      <Footer />
+      <Footer percent={(percent !== null) ? percent : ""} />
     </>
   );
 }
@@ -151,7 +234,6 @@ const Habits = styled.ul`
       align-items: center;
       justify-content: center;
 
-      background: ${(props)=> props.done ? '#8FC549' : '#EBEBEB'};
       border: 1px solid #e7e7e7;
       border-radius: 5px;
 

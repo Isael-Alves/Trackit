@@ -5,10 +5,12 @@ import { BsTrash } from "react-icons/bs";
 import React, { useState, useEffect } from "react";
 import { AuthContext } from "../../providers/auth";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import BoxNewHabit from "./BoxNewHabit";
 import Footer from "../Footer/Footer";
 
 export default function Habits() {
+  const navigate = useNavigate();
   const { dados, setScreen } = React.useContext(AuthContext);
   const { token } = dados;
   setScreen("habitos");
@@ -16,26 +18,37 @@ export default function Habits() {
   const [myHabits, setMyHabits] = useState([]);
   const daysWeek = ["D", "S", "T", "Q", "Q", "S", "S"];
 
+  function checkLoggedUser() {
+    if (token === undefined) {
+      navigate("../");
+    }
+  }
+  checkLoggedUser();
+
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   };
 
+function renderMayHabits(){
+  const promise = axios.get(
+    `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits`,
+    config
+  );
+
+  promise.then((res) => {
+    setMyHabits(res.data);
+  });
+
+  promise.catch((err) => {
+    const message = err.response.statusText;
+    alert(message);
+  });
+}
+
   useEffect(() => {
-    const promise = axios.get(
-      `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits`,
-      config
-    );
-
-    promise.then((res) => {
-      setMyHabits(res.data);
-    });
-
-    promise.catch((err) => {
-      const message = err.response.statusText;
-      alert(message);
-    });
+    renderMayHabits();
   }, []);
 
   function escolherCor(habit, i) {
@@ -61,6 +74,7 @@ export default function Habits() {
 
       promise.then(() => {
         setAddHabit(false);
+        renderMayHabits();
       });
 
       promise.catch((err) => {
@@ -114,7 +128,11 @@ export default function Habits() {
       {!addHabit ? (
         ""
       ) : (
-        <BoxNewHabit setAddHabit={setAddHabit} myHabits={myHabits} token={token} />
+        <BoxNewHabit
+          setAddHabit={setAddHabit}
+          token={token}
+          renderMayHabits={renderMayHabits}
+        />
       )}
       {renderHabits()}
       <Footer />

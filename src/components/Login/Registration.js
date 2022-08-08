@@ -81,7 +81,8 @@ function Registration() {
           required
         ></input>
         <input
-          type="text"
+          type="image"
+          alt=""
           name="image"
           placeholder="foto"
           onChange={handleForm}
