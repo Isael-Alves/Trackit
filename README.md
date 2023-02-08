@@ -1,3 +1,6 @@
+# TrackIt
+A service to send and receive huge (and not huge) payload to SQS with Lambda.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
