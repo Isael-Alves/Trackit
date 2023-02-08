@@ -1,5 +1,8 @@
 # TrackIt
-A service to send and receive huge (and not huge) payload to SQS with Lambda.
+Uma aplicação de acompanhamento de hábitos! Com direito a cadastro, login e muitas bibliotecas.
+
+## Deploy 
+projeto10-trackit-c8ea3lxmq-isael-alves.vercel.app
 
 # Getting Started with Create React App
 
